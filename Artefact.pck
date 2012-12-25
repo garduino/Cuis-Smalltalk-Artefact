@@ -1,4 +1,4 @@
-'From Cuis 4.1 of 12 December 2012 [latest update: #1517] on 20 December 2012 at 12:54:43 pm'!
+'From Cuis 4.1 of 12 December 2012 [latest update: #1517] on 25 December 2012 at 6:46:09 pm'!
 'Description Please enter a description for this package '!
 !classDefinition: #PDFBasicTest category: #'Artefact-Test'!
 TestCase subclass: #PDFBasicTest
@@ -1015,8 +1015,17 @@ courierWidths		"answer the widths for each characters of the courier font"		
 !PDFCourierFont methodsFor: 'accessing' stamp: 'OlivierAuverlot 2/22/2012 21:58'!
 family	^'courier'! !
 
-!PDFDataTable methodsFor: 'action' stamp: 'OlivierAuverlot 11/16/2012 13:57'!
-buildValue: aValue	"answer a PDFCellStyle instance for a value datatable cell"	^PDFCellElement new		styleSheet: (self styleSheet deepCopy);		wh: (self wh);		text: (aValue);		margin: (self margin)! !
+!PDFDataTable methodsFor: 'action' stamp: 'gsa 12/25/2012 18:36'!
+buildValue: aValue
+	"answer a PDFCellStyle instance for a value datatable cell"
+
+	^PDFCellElement new
+		" In Cuis #deepCopy was removed"
+		"styleSheet: (self styleSheet deepCopy);"
+		styleSheet: (self styleSheet copy);		
+		wh: (self wh);
+		text: (aValue);
+		margin: (self margin)! !
 
 !PDFDataTable methodsFor: 'accessing' stamp: 'OlivierAuverlot 10/31/2012 11:22'!
 data	^data! !
@@ -1039,8 +1048,25 @@ getSubElements 	"answer a view of a datatable"		| position |		position := s
 !PDFDataTableElement methodsFor: 'render' stamp: 'guillaumelarcheveque 11/23/2012 10:51'!
 getSubElements 	"answer a model of a datatable"		self data do: [ :aLine |		elements add: (aLine collect: [ :aValue | self buildValue: aValue ]).	].		^{ PDFDataTableCustomizedElement new		styleSheet: (self styleSheet);		from: (self from);		wh: (self wh);		data: elements }		! !
 
-!PDFDataTableWithCaptions methodsFor: 'action' stamp: 'OlivierAuverlot 11/16/2012 13:57'!
-buildCaption: aString	"answer a PDFCellStyle instance for a caption datatable cell"	|ink captionElement |	captionElement := PDFCellElement new 		styleSheet: (self styleSheet deepCopy); 		wh: self wh; 		text: aString;		margin: self margin.			"The fill color is remplaced by the caption color"	captionElement fillColor: (self captionColor). 		^captionElement		! !
+!PDFDataTableWithCaptions methodsFor: 'action' stamp: 'gsa 12/25/2012 18:38'!
+buildCaption: aString
+	"answer a PDFCellStyle instance for a caption datatable cell"
+
+	|ink captionElement |
+
+	captionElement := PDFCellElement new 
+		" In Cuis #deepCopy was removed"
+		"styleSheet: (self styleSheet deepCopy);" 	
+		styleSheet: (self styleSheet copy); 
+		wh: self wh; 
+		text: aString;
+		margin: self margin.
+		
+	"The fill color is remplaced by the caption color"
+	captionElement fillColor: (self captionColor). 
+	
+	^captionElement
+		! !
 
 !PDFDataTableWithCaptions methodsFor: 'accessing' stamp: 'OlivierAuverlot 11/9/2012 09:36'!
 captionColor	"Answer the color for the background of a caption. 	If not defined, answer the fill color of the style or the default fill color of the document".	^ captionColor ifNil: [ captionColor := (self fillColorIfAbsent: (self page document styleSheet)) ]! !
@@ -1060,11 +1086,60 @@ getSubElements 	"answer a datatable model with the captions in the columns"		
 !PDFDataTableWithRowsCaptionElement methodsFor: 'render' stamp: 'guillaumelarcheveque 11/23/2012 10:51'!
 getSubElements  	"answer a datatable model with the captions in the rows"		1 to: (self data size) do: [ :lineNumber |		elements add: (OrderedCollection new 			add: (self buildCaption: (self captions at: lineNumber));			addAll: ((self data at: lineNumber) collect: [ :aValue | self buildValue: aValue ]);			yourself ).	].	^OrderedCollection new 		add: (PDFDataTableCustomizedElement new			styleSheet: self styleSheet;			from: self from;			wh: self wh;			data: elements);			yourself! !
 
-!PDFDemos class methodsFor: 'text' stamp: 'OlivierAuverlot 11/28/2012 09:04'!
-alignmentsTest	"a simple demonstration of Artefact"		"PDFDemos alignmentsTest"		| pdfdoc myFont myBigFont aPage |	pdfdoc := PDFDocument new.		myFont := PDFHelveticaFont new fontSize: 16.		aPage := PDFPage new.	aPage add: (PDFFormattedTextElement new 		font: myFont; 		wh: 150@10; 		from: 0@0;		text: 'At left'	).	aPage add: (PDFFormattedTextElement new 		font: myFont; 		wh: 150@10; 		from: 10@20;		text: 'Center'; 		center	).	aPage add: (PDFFormattedTextElement new 		font: myFont; 		wh: 150@10; 		from: 10@30;		text: 'At right'; 		right	).	pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'alignmentsTest.pdf'.! !
+!PDFDemos class methodsFor: 'text' stamp: 'gsa 12/25/2012 18:16'!
+alignmentsTest
 
-!PDFDemos class methodsFor: 'draw' stamp: 'guillaumelarcheveque 11/23/2012 14:02'!
-alineTest	"drawing with simple line"		"self alineTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.	aPage add: (PDFLineElement new from: 0@0; to: 210@60; drawColor: (PDFColor new setColor: #(255 0 0) )).				pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'alinedTest.pdf'.! !
+	"a simple demonstration of Artefact"
+	
+	"PDFDemos alignmentsTest"
+	
+	| pdfdoc myFont myBigFont aPage |
+	pdfdoc := PDFDocument new.	
+
+	myFont := PDFHelveticaFont new fontSize: 16.
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFFormattedTextElement new 
+		font: myFont; 
+		wh: 150@10; 
+		from: 0@0;
+		text: 'At left'
+	).
+	aPage add: (PDFFormattedTextElement new 
+		font: myFont; 
+		wh: 150@10; 
+		from: 10@20;
+		text: 'Center'; 
+		center
+	).
+	aPage add: (PDFFormattedTextElement new 
+		font: myFont; 
+		wh: 150@10; 
+		from: 10@30;
+		text: 'At right'; 
+		right
+	).
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'alignmentsTest.pdf'.! !
+
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
+alineTest
+	"drawing with simple line"
+	
+	"self alineTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFLineElement new from: 0@0; to: 210@60; drawColor: (PDFColor new setColor: #(255 0 0) )).
+			
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'alinedTest.pdf'.! !
 
 !PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/20/2012 08:38'!
 arrowTest
@@ -1125,41 +1200,401 @@ arrowTest
 	
 	pdfdoc exportToFile: self demoPath  , 'arrowTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-bezierTest	"drawing bezier curves"		"self bezierTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.	aPage add: (PDFBezierCurveElement new 		from: 10@50;		to: { 100@10 . 140@100 . 200@30 };		thickness: 5	).		pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'bezierTest.pdf'.! !
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
+bezierTest
+	"drawing bezier curves"
+	
+	"self bezierTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
 
-!PDFDemos class methodsFor: 'composite' stamp: 'guillaumelarcheveque 11/23/2012 11:46'!
-cellTest	"self cellTest"		"Demonstration of PDFCellElement"		| pdfdoc myFont myTitleFont aPage |	pdfdoc := PDFDocument new.		myTitleFont := PDFTimesFont new fontSize: 24; bold: true.		aPage := PDFPage new.	aPage add: (PDFCellElement new		from: 10@5;		wh: 190@10;		fillColor: (PDFColor new setGreyLevel: 224);		text: 'Demonstration of PDFCellStyle';		font: myTitleFont;		center	).		"horizontal alignment"	aPage add: (PDFCellElement new  		from: 10@20;		wh: 50@10;		text: 'alignment: left';		left	).		aPage add: (PDFCellElement new  		from: 80@20;		wh: 50@10;		text: 'alignment: center'	 ).		aPage add: (PDFCellElement new  		from: 150@20;		wh: 50@10;		text: 'alignment: right';		right	).	"vertical alignment"	aPage add: (PDFCellElement new  		from: 10@40;		wh: 50@10;		text: 'vertical: top';		left;		top	).		aPage add: (PDFCellElement new  		from: 80@40;		wh: 50@10;		text: 'vertical: middle';		center;		middle	).		aPage add: (PDFCellElement new  		from: 150@40;		wh: 50@10;		text: 'vertical: bottom';		right;		bottom	).	"colors"	aPage add: (PDFCellElement new  		from: 10@60;		wh: 50@10;		textColor: (PDFColor new setColor: #(0 0 255));		drawColor: (PDFColor new setColor: #(255 0 0));		text: 'text: blue border: red';		center;		middle	).		aPage add: (PDFCellElement new  		from: 80@60;		wh: 50@10;		textColor: (PDFColor new setColor: #(0 0 255));		fillColor: (PDFColor new setColor: #(0 255 0));		text: 'background: green';		center;		middle	).		aPage add: (PDFCellElement new  		from: 150@60;		wh: 50@10;		textColor: (PDFColor new setGreyLevel: 255);		fillColor: (PDFColor new setGreyLevel: 128);		dotted: (PDFDotted new length: 1; space: 1);		text: 'grey level & dotted border';		thickness: 0.2;		center;		middle	).		aPage add: (PDFCellElement new  		from: 10@80;		text: 'A cell without wh'	).	aPage add: (PDFCellElement new  		wh: 50@10;		text: 'A cell without xy'	).	aPage add: (PDFCellElement new  		wh: 50@10;		text: 'linefeed: true';		linefeed: true	).	aPage add: (PDFCellElement new  		wh: 50@10;		text: 'linefeed: false';		linefeed: false	).	aPage add: (PDFCellElement new  		wh: 50@10;		text: 'end'	).		pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'cellTest.pdf'.! !
+	aPage add: (PDFBezierCurveElement new 
+		from: 10@50;
+		to: { 100@10 . 140@100 . 200@30 };
+		thickness: 5
+	).
+	
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'bezierTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-circlesTest	"drawing circles"		"self circlesTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.	aPage add: (PDFCircleElement new 		from: 50@50;		radius: 30	).	aPage add: (PDFFilledCircleElement new 		from: 120@50;		radius: 30;		fillColor: (PDFColor new setColor: #(0 255 0));		drawColor: (PDFColor new setColor: #(255 0 0))	).		pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'circlesTest.pdf'.! !
+!PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/25/2012 18:06'!
+cellTest
+	"self cellTest"
+	
+	"Demonstration of PDFCellElement"
+	
+	| pdfdoc myFont myTitleFont aPage |
+	pdfdoc := PDFDocument new.	
+
+	myTitleFont := PDFTimesFont new fontSize: 24; bold: true.
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFCellElement new
+		from: 10@5;
+		wh: 190@10;
+		fillColor: (PDFColor new setGreyLevel: 224);
+		text: 'Demonstration of PDFCellStyle';
+		font: myTitleFont;
+		center
+	).
+	
+	"horizontal alignment"
+	aPage add: (PDFCellElement new  
+		from: 10@20;
+		wh: 50@10;
+		text: 'alignment: left';
+		left
+	).
+	
+	aPage add: (PDFCellElement new  
+		from: 80@20;
+		wh: 50@10;
+		text: 'alignment: center'
+	 ).
+	
+	aPage add: (PDFCellElement new  
+		from: 150@20;
+		wh: 50@10;
+		text: 'alignment: right';
+		right
+	).
+
+	"vertical alignment"
+	aPage add: (PDFCellElement new  
+		from: 10@40;
+		wh: 50@10;
+		text: 'vertical: top';
+		left;
+		top
+	).
+	
+	aPage add: (PDFCellElement new  
+		from: 80@40;
+		wh: 50@10;
+		text: 'vertical: middle';
+		center;
+		middle
+	).
+	
+	aPage add: (PDFCellElement new  
+		from: 150@40;
+		wh: 50@10;
+		text: 'vertical: bottom';
+		right;
+		bottom
+	).
+
+	"colors"
+	aPage add: (PDFCellElement new  
+		from: 10@60;
+		wh: 50@10;
+		textColor: (PDFColor new setColor: #(0 0 255));
+		drawColor: (PDFColor new setColor: #(255 0 0));
+		text: 'text: blue border: red';
+		center;
+		middle
+	).
+	
+	aPage add: (PDFCellElement new  
+		from: 80@60;
+		wh: 50@10;
+		textColor: (PDFColor new setColor: #(0 0 255));
+		fillColor: (PDFColor new setColor: #(0 255 0));
+		text: 'background: green';
+		center;
+		middle
+	).
+	
+	aPage add: (PDFCellElement new  
+		from: 150@60;
+		wh: 50@10;
+		textColor: (PDFColor new setGreyLevel: 255);
+		fillColor: (PDFColor new setGreyLevel: 128);
+		dotted: (PDFDotted new length: 1; space: 1);
+		text: 'grey level & dotted border';
+		thickness: 0.2;
+		center;
+		middle
+	).
+	
+	aPage add: (PDFCellElement new  
+		from: 10@80;
+		text: 'A cell without wh'
+	).
+	aPage add: (PDFCellElement new  
+		wh: 50@10;
+		text: 'A cell without xy'
+	).
+	aPage add: (PDFCellElement new  
+		wh: 50@10;
+		text: 'linefeed: true';
+		linefeed: true
+	).
+	aPage add: (PDFCellElement new  
+		wh: 50@10;
+		text: 'linefeed: false';
+		linefeed: false
+	).
+	aPage add: (PDFCellElement new  
+		wh: 50@10;
+		text: 'end'
+	).
+
+	
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'cellTest.pdf'.! !
+
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
+circlesTest
+	"drawing circles"
+	
+	"self circlesTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFCircleElement new 
+		from: 50@50;
+		radius: 30
+	).
+
+	aPage add: (PDFFilledCircleElement new 
+		from: 120@50;
+		radius: 30;
+		fillColor: (PDFColor new setColor: #(0 255 0));
+		drawColor: (PDFColor new setColor: #(255 0 0))
+	).
+	
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'circlesTest.pdf'.! !
 
 !PDFDemos class methodsFor: 'color' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 colorTest	"generate a sample document with colors"	"self colorTest"		| pdfdoc aPage myFont |	pdfdoc := PDFDocument new.		aPage := PDFPage new.	aPage add: (PDFCellElement new 		font: (PDFTimesFont new fontSize: 32);		wh: 100@20; 		border: true; 		text: 'Hello World!!';		ink: (PDFColor new setColor: #(255 0 0) );		fillColor: (PDFColor new setColor: #(0 255 0))		).	aPage add: (PDFRectElement new 		from: 10@50;		wh: 50@50; 		width: 5;		ink: (PDFColor new setColor: #(0 0 255));		fillColor: (PDFColor new setColor: #(0 255 0))		).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'colorTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'composite' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-datatableCustomizedElementTest	"generate a customized datatable"	"self datatableCustomizedElementTest"		| pdfdoc aPage |			pdfdoc := PDFDocument new.	pdfdoc setFormat: PDFA4Format new.	pdfdoc title: 'Users report'.		aPage := PDFPage new.	aPage add: (PDFDataTableCustomizedElement new		data: {			{			"Column captions"			PDFCellElement new text: 'Name'; fillColor: (PDFColor new setGreyLevel: 230).			PDFCellElement new text: 'Surname'; fillColor: (PDFColor new setGreyLevel: 230).			PDFCellElement new text: 'Email'; fillColor: (PDFColor new setGreyLevel: 230).			}.					{			"first line"			PDFCellElement new text: 'Smith'.			PDFCellElement new text: 'Peter'.			PDFCellElement new text: 'peter.smith@mail.org'.			}.			{			"second line"			"the email is in a red cell... probably a bad email address :-)"			PDFCellElement new text: 'Jones'.			PDFCellElement new text: 'Mickael'.			PDFCellElement new text: 'mickael.jones@epr.com'; fillColor: (PDFColor new setColor: #(255 0 0)).			}.			{			"third line Unmatched"			PDFCellElement new text: 'washington'.			PDFCellElement new text: 'robert'.			PDFCellElement new text: 'robert.washington@blif.com'.			}.		};		from: 10@20;		wh: 40@5	). 		pdfdoc add: aPage.			pdfdoc exportToFile: self demoPath , 'datatableCustomizedStyleTest.pdf'.		! !
+!PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/25/2012 18:23'!
+datatableCustomizedElementTest
+	"generate a customized datatable"
 
-!PDFDemos class methodsFor: 'composite' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-datatableTest	"generate a datatable"	"self datatableTest"		| pdfdoc aPage |			pdfdoc := PDFDocument new.	pdfdoc setFormat: PDFA4Format new.	pdfdoc title: 'Users report'.		aPage := PDFPage new.	aPage add: (PDFDataTableElement new		data: #(			#('Smith' 'Peter' 'peter.smith@mail.org')			#('Jones' 'Mickael' 'mickael.jones@epr.com')			#('washington' 'robert' 'robert.washington@blif.com')		);		from: 10@10;		wh: 60@5	).	aPage add: (PDFDataTableElement new		data: #(			#('Smith' 'Peter' 'peter.smith@mail.org')			#('Jones' 'Mickael' 'mickael.jones@epr.com')			#('washington' 'robert' 'robert.washington@blif.com')		);		textColor:(PDFColor new setColor: #(0 0 255));		fillColor: (PDFColor new setGreyLevel: 230);		font: (PDFTimesFont new fontSize: 6);		dotted: (PDFDotted new length: 0.2; space: 0.2);		from: 10@30;		wh: 30@5	).		pdfdoc add: aPage.			pdfdoc exportToFile: self demoPath , 'datatableTest.pdf'.		! !
+	"self datatableCustomizedElementTest"
+	
+	| pdfdoc aPage |
+		
+	pdfdoc := PDFDocument new.
+	pdfdoc setFormat: PDFA4Format new.
+	pdfdoc title: 'Users report'.
+	
+	aPage := PDFPage new.
+	aPage add: (PDFDataTableCustomizedElement new
+		data: {
+			{
+			"Column captions"
+			PDFCellElement new text: 'Name'; fillColor: (PDFColor new setGreyLevel: 230).
+			PDFCellElement new text: 'Surname'; fillColor: (PDFColor new setGreyLevel: 230).
+			PDFCellElement new text: 'Email'; fillColor: (PDFColor new setGreyLevel: 230).
+			}.		
+			{
+			"first line"
+			PDFCellElement new text: 'Smith'.
+			PDFCellElement new text: 'Peter'.
+			PDFCellElement new text: 'peter.smith@mail.org'.
+			}.
+			{
+			"second line"
+			"the email is in a red cell... probably a bad email address :-)"
+			PDFCellElement new text: 'Jones'.
+			PDFCellElement new text: 'Mickael'.
+			PDFCellElement new text: 'mickael.jones@epr.com'; fillColor: (PDFColor new setColor: #(255 0 0)).
+			}.
+			{
+			"third line Unmatched"
+			PDFCellElement new text: 'washington'.
+			PDFCellElement new text: 'robert'.
+			PDFCellElement new text: 'robert.washington@blif.com'.
+			}.
+		};
+		from: 10@20;
+		wh: 40@5
+	). 
+	
+	pdfdoc add: aPage.
+		
+	pdfdoc exportToFile: self demoPath , 'datatableCustomizedStyleTest.pdf'.
 
-!PDFDemos class methodsFor: 'composite' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-datatableWithCaptionsTest	"generate a datatable with captions"	"self datatableWithCaptionsTest"		| pdfdoc aPage |			pdfdoc := PDFDocument new.	pdfdoc setFormat: PDFA4Format new.	pdfdoc title: 'Users report'.		aPage := PDFPage new.		aPage add: (PDFDataTableWithColumnsCaptionElement new		captions: #( 'Name' 'Surname' 'email');		data: #(			#('Smith' 'Peter' 'peter.smith@mail.org')			#('Jones' 'Mickael' 'mickael.jones@epr.com')			#('washington' 'robert' 'robert.washington@blif.com')		);		from: 10@20;		wh: 40@5;		captionColor: (PDFColor new setGreyLevel: 192)	).		aPage add: (PDFDataTableWithRowsCaptionElement new		captions: #( 'Name' 'Surname' 'email');		data: #(			#('Smith' 'Jones' 'washington')			#('Peter' 'Mickael' 'robert')			#('peter.smith@mail.org' 'mickael.jones@epr.com' 'robert.washington@blif.com')		);		from: 10@50;		wh: 40@5;		captionColor: (PDFColor new setGreyLevel: 192)	).		pdfdoc add: aPage.			pdfdoc exportToFile: self demoPath , 'datatableWithCaptionsTest.pdf'.		! !
+	
+	! !
+
+!PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/25/2012 18:23'!
+datatableTest
+	"generate a datatable"
+
+	"self datatableTest"
+	
+	| pdfdoc aPage |
+		
+	pdfdoc := PDFDocument new.
+	pdfdoc setFormat: PDFA4Format new.
+	pdfdoc title: 'Users report'.
+	
+	aPage := PDFPage new.
+	aPage add: (PDFDataTableElement new
+		data: #(
+			#('Smith' 'Peter' 'peter.smith@mail.org')
+			#('Jones' 'Mickael' 'mickael.jones@epr.com')
+			#('washington' 'robert' 'robert.washington@blif.com')
+		);
+		from: 10@10;
+		wh: 60@5
+	).
+
+	aPage add: (PDFDataTableElement new
+		data: #(
+			#('Smith' 'Peter' 'peter.smith@mail.org')
+			#('Jones' 'Mickael' 'mickael.jones@epr.com')
+			#('washington' 'robert' 'robert.washington@blif.com')
+		);
+		textColor:(PDFColor new setColor: #(0 0 255));
+		fillColor: (PDFColor new setGreyLevel: 230);
+		font: (PDFTimesFont new fontSize: 6);
+		dotted: (PDFDotted new length: 0.2; space: 0.2);
+		from: 10@30;
+		wh: 30@5
+	).
+	
+	pdfdoc add: aPage.
+		
+	pdfdoc exportToFile: self demoPath , 'datatableTest.pdf'.
+
+	
+	! !
+
+!PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/25/2012 18:23'!
+datatableWithCaptionsTest
+	"generate a datatable with captions"
+
+	"self datatableWithCaptionsTest"
+	
+	| pdfdoc aPage |
+		
+	pdfdoc := PDFDocument new.
+	pdfdoc setFormat: PDFA4Format new.
+	pdfdoc title: 'Users report'.
+	
+	aPage := PDFPage new.
+	
+	aPage add: (PDFDataTableWithColumnsCaptionElement new
+		captions: #( 'Name' 'Surname' 'email');
+		data: #(
+			#('Smith' 'Peter' 'peter.smith@mail.org')
+			#('Jones' 'Mickael' 'mickael.jones@epr.com')
+			#('washington' 'robert' 'robert.washington@blif.com')
+		);
+		from: 10@20;
+		wh: 40@5;
+		captionColor: (PDFColor new setGreyLevel: 192)
+	).	
+
+	aPage add: (PDFDataTableWithRowsCaptionElement new
+		captions: #( 'Name' 'Surname' 'email');
+		data: #(
+			#('Smith' 'Jones' 'washington')
+			#('Peter' 'Mickael' 'robert')
+			#('peter.smith@mail.org' 'mickael.jones@epr.com' 'robert.washington@blif.com')
+		);
+		from: 10@50;
+		wh: 40@5;
+		captionColor: (PDFColor new setGreyLevel: 192)
+	).
+	
+	pdfdoc add: aPage.
+		
+	pdfdoc exportToFile: self demoPath , 'datatableWithCaptionsTest.pdf'.
+
+	
+	! !
 
 !PDFDemos class methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 demo	"a simple demonstration of Artefact"		"PDFDemos demo"		| pdfdoc myFont myBigFont aPage |	pdfdoc := PDFDocument new.		myBigFont := PDFCourierFont new fontSize: 36; bold: true.	myFont := PDFHelveticaFont new fontSize: 16.		aPage := PDFPage new.	aPage add: (PDFCellElement new 		font: myBigFont; 		wh: 100@60; 		border: true; 		linefeed: true; 		textColor: (PDFColor new setColor: #(0 255 0));		text: 'Première ligne').			aPage add: (PDFCellElement new 		font: myBigFont;		wh: 100@24; 		border: true; 		linefeed: true;		textColor: (PDFColor new setColor: #(128 128 0)); 		text: 'Artefact').		aPage add: (PDFCellElement new 		font: myFont; 		wh: 100@10; 		border: true; 		linefeed: true; 		textColor: (PDFColor new setColor: #(0 0 0));		text: 'PDF Framework for Pharo').				aPage add: (PDFLineElement new from: 10@10; to: 20@10; drawColor: (PDFColor new setColor: #(255 0 0))).	aPage add: (PDFLineElement new from: 10@10; to: 10@20; drawColor:(PDFColor new setColor: #(255 0 0))).		pdfdoc add: aPage.	pdfdoc explore.		pdfdoc exportToFile: self demoPath , 'demo.pdf'.! !
 
-!PDFDemos class methodsFor: 'accessing' stamp: 'OlivierAuverlot 11/30/2012 09:37'!
-demoPath	^'/home/olivier/Desktop/'! !
+!PDFDemos class methodsFor: 'accessing' stamp: 'gsa 12/25/2012 18:15'!
+demoPath
+	"CAUTION HARDCODED PATH HERE!!"
+	"^'/home/olivier/Desktop/'"
+	^'/Users/Shared/gsa/dev/Cuis41/'! !
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-dottedTest	"drawing with dotted"		"self dottedTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.		aPage add: (PDFLineElement new from: 0@0; to: 30@0).	aPage add: (PDFLineElement new from: 0@0; to: 0@30).	aPage add: (PDFLineElement new from: 0@5; to: 150@5).		aPage add: (PDFLineElement new		from: 10@10;		to: 100@30;		dotted: (PDFDotted new length: 2; space: 3)	).		aPage add: (PDFLineElement new		from: 30@30;		to: 80@50;		dotted: (PDFDotted new)	).	aPage add: (PDFLineElement new		from: 10@10;		to: 10@50	 ).		aPage add: (PDFRectElement new		from: 80@80;		wh: 100@30; 		dotted: (PDFDotted new length: 5; space: 3);		thickness:  2		).				pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'dottedTest.pdf'.! !
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
+dottedTest
+	"drawing with dotted"
+	
+	"self dottedTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
+	
+	aPage add: (PDFLineElement new from: 0@0; to: 30@0).
+	aPage add: (PDFLineElement new from: 0@0; to: 0@30).
+	aPage add: (PDFLineElement new from: 0@5; to: 150@5).
+	
+	aPage add: (PDFLineElement new
+		from: 10@10;
+		to: 100@30;
+		dotted: (PDFDotted new length: 2; space: 3)
+	).
+	
+	aPage add: (PDFLineElement new
+		from: 30@30;
+		to: 80@50;
+		dotted: (PDFDotted new)
+	).
+
+	aPage add: (PDFLineElement new
+		from: 10@10;
+		to: 10@50
+	 ).
+	
+	aPage add: (PDFRectElement new
+		from: 80@80;
+		wh: 100@30; 
+		dotted: (PDFDotted new length: 5; space: 3);
+		thickness:  2
+		).
+			
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'dottedTest.pdf'.! !
 
 !PDFDemos class methodsFor: 'color' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 drawStyleSheetTest	"generate a sample document with colors"	"self drawStyleSheetTest"		| pdfdoc aPage myFont |	pdfdoc := PDFDocument new.		aPage := PDFPage new.	aPage add: (PDFRectElement new 		from: 10@50;		wh: 50@50; 		thickness: 5;		drawColor: (PDFColor new setColor: #(0 0 255));		fillColor: (PDFColor new setColor: #(0 255 0))		).			aPage add: (PDFRectElement new 		from: 50@60;		wh: 50@50).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'drawStyleSheetTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'text' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-euroTest	"a PDF document with the euro sign"	"PDFDemos euroTest"	| pdfdoc aPage theText|       pdfdoc := PDFDocument new.       aPage := PDFPage new.	theText :=  ('Price: (24{1})A\B' format: { (128 asCharacter) asString} ).	       aPage add: (PDFTextElement new from: 50@10; text: theText; font: (PDFTimesFont new)).       aPage add: (PDFTextElement new from: 50@20; text: theText; font: (PDFCourierFont new)).       aPage add: (PDFTextElement new from: 50@30; text: theText; font: (PDFHelveticaFont  new)).	pdfdoc add: aPage.	       pdfdoc exportToFile: self demoPath , 'euroTest.pdf'.! !
+!PDFDemos class methodsFor: 'text' stamp: 'gsa 12/25/2012 18:16'!
+euroTest
+	"a PDF document with the euro sign"
+
+	"PDFDemos euroTest"
+	| pdfdoc aPage theText|
+
+       pdfdoc := PDFDocument new.
+
+       aPage := PDFPage new.
+	theText :=  ('Price: (24{1})A\B' format: { (128 asCharacter) asString} ).
+	
+       aPage add: (PDFTextElement new from: 50@10; text: theText; font: (PDFTimesFont new)).
+       aPage add: (PDFTextElement new from: 50@20; text: theText; font: (PDFCourierFont new)).
+       aPage add: (PDFTextElement new from: 50@30; text: theText; font: (PDFHelveticaFont  new)).
+
+	pdfdoc add: aPage.
+	
+       pdfdoc exportToFile: self demoPath , 'euroTest.pdf'.! !
 
 !PDFDemos class methodsFor: 'color' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 greyLevelTest	"generate a sample document with grey levels"	"self greyLevelTest"		| pdfdoc aPage myFont |	pdfdoc := PDFDocument new.		aPage := PDFPage new.	aPage add: (PDFTextElement new 		from: 10@10; 		text: 'A grey level text'; 		font: (PDFCourierFont new);		ink: (PDFColor new setGreyLevel: 128)		).			aPage add: (PDFRectElement new 		from: 10@20;		wh: 50@50; 		width: 5;		ink: (PDFColor new setGreyLevel: 196);		fillColor: (PDFColor new setGreyLevel: 164)		).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'greyLevelTest.pdf'.! !
@@ -1173,29 +1608,219 @@ imagePNG	"Artefact use an PNG file"		"self imagePNG"		| pdfdoc myImage aPag
 !PDFDemos class methodsFor: 'document' stamp: 'OlivierAuverlot 9/21/2012 20:57'!
 infosTest	"generate a sample document with informations"	"self infosTest"		| pdfdoc aPage aSecondPage |	pdfdoc := PDFDocument new.		pdfdoc title: 'Le titre du document'; 		subject: 'test de la zone d''information'; 		author: 'Olivier Auverlot'; 		keywords: 'test zone infos';		creator: 'Artefact - Pharo'.		aPage := PDFPage new.		pdfdoc add: aPage.	pdfdoc exportToFile: self demoPath , 'infosTest.pdf'.		! !
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-lineTest	"drawing with simple lines around the page"		"self lineTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.	aPage add: (PDFLineElement new from: 0@0; to: 210@0).	aPage add: (PDFLineElement new from: 0@0; to: 0@297).	aPage add: (PDFLineElement new from: 0@297; to: 210@297).	aPage add: (PDFLineElement new from: 210@297; to: 210@0).				pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'lineTest.pdf'.! !
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
+lineTest
+	"drawing with simple lines around the page"
+	
+	"self lineTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFLineElement new from: 0@0; to: 210@0).
+	aPage add: (PDFLineElement new from: 0@0; to: 0@297).
+	aPage add: (PDFLineElement new from: 0@297; to: 210@297).
+	aPage add: (PDFLineElement new from: 210@297; to: 210@0).
+			
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'lineTest.pdf'.! !
 
 !PDFDemos class methodsFor: 'document' stamp: 'OlivierAuverlot 11/16/2012 13:57'!
 multiOrientationsTest	"Create a document with two pages and two different orientations"		"self multiOrientationsTest"		| pdfdoc myBigFont firstPage secondPage myLandscapeFormat |	pdfdoc := PDFDocument new.		myLandscapeFormat := PDFA3Format new setLandscape.		myBigFont := PDFTimesFont new fontSize: 16.		firstPage := PDFPage new.		firstPage add: (PDFCellElement new 		font: myBigFont; 		wh: 40@10; 		text: 'Page 1').		secondPage := PDFPage new format: myLandscapeFormat.		secondPage add: (PDFCellElement new 		font: myBigFont; 		wh: 40@10; 		text: 'Page en A3').					pdfdoc add: firstPage.	pdfdoc add: secondPage.	pdfdoc exportToFile: self demoPath , 'multiOrientationsTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'composite' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-paragraphTest	"Use of paragraphs"		"self paragraphTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.	aPage add: (PDFParagraphElement new 		from: 90@40;		wh: 100@20; 		text: '1 Emensis itaque difficultatibus multis et nive obrutis callibus plurimis ubi prope Rauracum ventum est ad supercilia fluminis Rheni, resistente multitudine Alamanna pontem suspendere navium conpage Romani vi nimia vetabantur ritu grandinis undique convolantibus telis, et cum id inpossibile videretur, imperator cogitationibus magnis attonitus, quid capesseret ambigebat.').	aPage add: (PDFParagraphElement new 		from: 20@40;		wh: 60@60; 		text: '2 Quam ob rem ut ii qui superiores sunt submittere se debent in amicitia, sic quodam modo inferiores extollere. Sunt enim quidam qui molestas amicitias faciunt, cum ipsi se contemni putant; quod non fere contingit nisi iis qui etiam contemnendos se arbitrantur; qui hac opinione non modo verbis sed etiam opere levandi sunt.').	aPage add: (PDFParagraphElement new 		from: 100@80;		wh: 60@70; 		text: '3 Denique Antiochensis ordinis vertices sub uno elogio iussit occidi ideo efferatus, quod ei celebrari vilitatem intempestivam urgenti, cum inpenderet inopia, gravius rationabili responderunt; et perissent ad unum ni comes orientis tunc Honoratus fixa constantia restitisset.';		center).			aPage add: (PDFParagraphElement new 		from: 10@120;		wh: 60@80; 		text: '4 Igitur per multiplices dilatata fortunas cum ambigerentur quaedam, non nulla levius actitata constaret, post multorum clades Apollinares ambo pater et filius in exilium acti cum ad locum Crateras nomine pervenissent, villam scilicet suam quae ab Antiochia vicensimo et quarto disiungitur lapide, ut mandatum est, fractis cruribus occiduntur.';		right		).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'paragraph.pdf'.! !
+!PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/25/2012 18:23'!
+paragraphTest
+	"Use of paragraphs"
+	
+	"self paragraphTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-polygonsTest	"drawing polygons"		"self polygonsTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.	aPage add: (PDFPolygonElement new 		from: 10@10; 		to: { 60@20 . 50@40 . 30@50 . 15@45 };		drawColor: (PDFColor new setColor: #(0 0 255))	).		aPage add: (PDFFilledPolygonElement new 		from: 10@55; 		to: { 60@60 . 50@100 . 30@110 . 15@105 };		drawColor: (PDFColor new setColor: #(0 0 255));		fillColor: (PDFColor new setColor: #(255 0 0));		thickness: 5		).	pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'polygonsTest.pdf'.! !
+	aPage add: (PDFParagraphElement new 
+		from: 90@40;
+		wh: 100@20; 
+		text: '1 Emensis itaque difficultatibus multis et nive obrutis callibus plurimis ubi prope Rauracum ventum est ad supercilia fluminis Rheni, resistente multitudine Alamanna pontem suspendere navium conpage Romani vi nimia vetabantur ritu grandinis undique convolantibus telis, et cum id inpossibile videretur, imperator cogitationibus magnis attonitus, quid capesseret ambigebat.').
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-rectsTest	"intersecting rects"		"self rectsTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.		aPage add: (PDFRectElement new		from: 0@0;		wh: 210@297	).	aPage add: (PDFRectElement new		from: 10@10;		wh: 100@30 ).	aPage add: (PDFFilledRectElement new		from: 15@15;		wh: 100@30;		fillColor: (PDFColor new setColor: #(142 24 78))		).			aPage add: (PDFRectElement new		from: 20@20;		wh: 100@30;		drawColor: (PDFColor new setColor: #(0 255 0)) 		).	pdfdoc add: aPage.	pdfdoc exportToFile: self demoPath  , 'rectsTest.pdf'.! !
+	aPage add: (PDFParagraphElement new 
+		from: 20@40;
+		wh: 60@60; 
+		text: '2 Quam ob rem ut ii qui superiores sunt submittere se debent in amicitia, sic quodam modo inferiores extollere. Sunt enim quidam qui molestas amicitias faciunt, cum ipsi se contemni putant; quod non fere contingit nisi iis qui etiam contemnendos se arbitrantur; qui hac opinione non modo verbis sed etiam opere levandi sunt.').
 
-!PDFDemos class methodsFor: 'text' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-textTest	"PDFDemos textTest"		| pdfdoc myFont myBigFont aPage |	pdfdoc := PDFDocument new.		myFont := PDFTimesFont new fontSize: 24.		aPage := PDFPage new.	aPage add: (PDFTextElement new  		from: 10@10;		text: 'A very simple text'	).	aPage add: (PDFTextElement new 		font: myFont; 		from: 10@30; 		text: 'A very simple text with specified font'	).	aPage add: (PDFTextElement new 		textColor: (PDFColor new setColor: #(255 0 0 ));		from: 10@50; 		text: 'A very simple text with specified color'	).	aPage add: (PDFTextElement new 		textColor: (PDFColor new setColor: #(0 0 255 ));		font: myFont; 		from: 10@70; 		text: 'A very simple text with specified color and font'	).	pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'textTest.pdf'.! !
+	aPage add: (PDFParagraphElement new 
+		from: 100@80;
+		wh: 60@70; 
+		text: '3 Denique Antiochensis ordinis vertices sub uno elogio iussit occidi ideo efferatus, quod ei celebrari vilitatem intempestivam urgenti, cum inpenderet inopia, gravius rationabili responderunt; et perissent ad unum ni comes orientis tunc Honoratus fixa constantia restitisset.';
+		center).
+		
+	aPage add: (PDFParagraphElement new 
+		from: 10@120;
+		wh: 60@80; 
+		text: '4 Igitur per multiplices dilatata fortunas cum ambigerentur quaedam, non nulla levius actitata constaret, post multorum clades Apollinares ambo pater et filius in exilium acti cum ad locum Crateras nomine pervenissent, villam scilicet suam quae ab Antiochia vicensimo et quarto disiungitur lapide, ut mandatum est, fractis cruribus occiduntur.';
+		right
+		).
+		
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'paragraph.pdf'.! !
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-thicknessTest	"generate a sample document for testing the draw objects"	"self thicknessTest"		| pdfdoc aPage width xy1 xy2 |	pdfdoc := PDFDocument new.		aPage := PDFPage new.	width := 1.	xy1 := 10@20.	xy2 := 100@20.		1 to: 5 do: [ :i |		aPage add: (PDFLineElement new from: xy1; to: xy2; thickness: i).		xy1 := (xy1 x) @ (xy1 y + 10).		xy2 := (xy2 x) @ (xy2 y + 10).	].			aPage add: (PDFRectElement new 		from: 50@80;		wh: 50@50; 		thickness:  5		).		pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'thicknessTest.pdf'.		! !
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
+polygonsTest
+	"drawing polygons"
+	
+	"self polygonsTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
 
-!PDFDemos class methodsFor: 'draw' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-twoColoredRectsTest	"intersecting rects"		"self twoColoredRectsTest"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.		aPage add: (PDFRectElement new		from: 10@10;		wh: 100@30;		fillColor: (PDFColor new setColor: #(142 24 78));		drawColor: (PDFColor new setColor: #(255 0 0))).	aPage add: (PDFRectElement new		from: 15@15;		wh: 100@30;		fillColor: (PDFColor new setColor: #(24 57 205));		drawColor: (PDFColor new setColor: #(0 255 0))).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath  , 'twoColoredRectTest.pdf'.! !
+	aPage add: (PDFPolygonElement new 
+		from: 10@10; 
+		to: { 60@20 . 50@40 . 30@50 . 15@45 };
+		drawColor: (PDFColor new setColor: #(0 0 255))
+	).
+	
+	aPage add: (PDFFilledPolygonElement new 
+		from: 10@55; 
+		to: { 60@60 . 50@100 . 30@110 . 15@105 };
+		drawColor: (PDFColor new setColor: #(0 0 255));
+		fillColor: (PDFColor new setColor: #(255 0 0));
+		thickness: 5	
+	).
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'polygonsTest.pdf'.! !
+
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:19'!
+rectsTest
+	"intersecting rects"
+	
+	"self rectsTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
+	
+	aPage add: (PDFRectElement new
+		from: 0@0;
+		wh: 210@297
+	).
+	aPage add: (PDFRectElement new
+		from: 10@10;
+		wh: 100@30 ).
+	aPage add: (PDFFilledRectElement new
+		from: 15@15;
+		wh: 100@30;
+		fillColor: (PDFColor new setColor: #(142 24 78))
+		).		
+	aPage add: (PDFRectElement new
+		from: 20@20;
+		wh: 100@30;
+		drawColor: (PDFColor new setColor: #(0 255 0)) 
+		).
+	pdfdoc add: aPage.
+
+	pdfdoc exportToFile: self demoPath  , 'rectsTest.pdf'.! !
+
+!PDFDemos class methodsFor: 'text' stamp: 'gsa 12/25/2012 18:17'!
+textTest
+	"PDFDemos textTest"
+	
+	| pdfdoc myFont myBigFont aPage |
+	pdfdoc := PDFDocument new.	
+
+	myFont := PDFTimesFont new fontSize: 24.
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFTextElement new  
+		from: 10@10;
+		text: 'A very simple text'
+	).
+	aPage add: (PDFTextElement new 
+		font: myFont; 
+		from: 10@30; 
+		text: 'A very simple text with specified font'
+	).
+	aPage add: (PDFTextElement new 
+		textColor: (PDFColor new setColor: #(255 0 0 ));
+		from: 10@50; 
+		text: 'A very simple text with specified color'
+	).
+	aPage add: (PDFTextElement new 
+		textColor: (PDFColor new setColor: #(0 0 255 ));
+		font: myFont; 
+		from: 10@70; 
+		text: 'A very simple text with specified color and font'
+	).
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'textTest.pdf'.! !
+
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:19'!
+thicknessTest
+	"generate a sample document for testing the draw objects"
+
+	"self thicknessTest"
+	
+	| pdfdoc aPage width xy1 xy2 |
+
+	pdfdoc := PDFDocument new.	
+	aPage := PDFPage new.
+	width := 1.
+	xy1 := 10@20.
+	xy2 := 100@20.
+	
+	1 to: 5 do: [ :i |
+		aPage add: (PDFLineElement new from: xy1; to: xy2; thickness: i).
+		xy1 := (xy1 x) @ (xy1 y + 10).
+		xy2 := (xy2 x) @ (xy2 y + 10).
+	].	
+	
+	aPage add: (PDFRectElement new 
+		from: 50@80;
+		wh: 50@50; 
+		thickness:  5
+		).
+	
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'thicknessTest.pdf'.
+
+	
+	! !
+
+!PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:19'!
+twoColoredRectsTest
+	"intersecting rects"
+	
+	"self twoColoredRectsTest"
+	
+	| pdfdoc aPage |
+	pdfdoc := PDFDocument new.	
+	
+	aPage := PDFPage new.
+	
+	aPage add: (PDFRectElement new
+		from: 10@10;
+		wh: 100@30;
+		fillColor: (PDFColor new setColor: #(142 24 78));
+		drawColor: (PDFColor new setColor: #(255 0 0))).
+	aPage add: (PDFRectElement new
+		from: 15@15;
+		wh: 100@30;
+		fillColor: (PDFColor new setColor: #(24 57 205));
+		drawColor: (PDFColor new setColor: #(0 255 0))).		
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath  , 'twoColoredRectTest.pdf'.! !
 
 !PDFDemos class methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 unCarresDansUnCarreStyle	"un test de style géométrique"		"self unCarresDansUnCarreStyle"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.		aPage add: (UnCarreDansUnCarre new		from: 10@10;		wh: 100@30;		borderSize: 5@2 ).			pdfdoc add: aPage.		pdfdoc exportToFile: '/home/olivier/Desktop/deuxCarreDansUnCarre.pdf'.! !
@@ -1275,8 +1900,14 @@ endPage: aPageSize	"End of the page contents"	self out: { 'endstream' . 'endo
 !PDFDocument methodsFor: 'tools' stamp: 'OlivierAuverlot 7/19/2012 15:28'!
 escape: aString	"answer a clean string at PDF format"		| str |	str := aString copyWithRegex: '\\' matchesReplacedWith: '\\\'.		str := str copyWithRegex: '\(' matchesReplacedWith: '\('.	str := str copyWithRegex: '\)' matchesReplacedWith: '\)'.	^str! !
 
-!PDFDocument methodsFor: 'action' stamp: 'OlivierAuverlot 9/14/2012 11:43'!
-exportToFile: aFileName	"Export the PDF document in a file"		| stream |	stream := StandardFileStream fileNamed: aFileName.	stream nextPutAll: self generate.	stream close.! !
+!PDFDocument methodsFor: 'action' stamp: 'gsa 12/25/2012 18:08'!
+exportToFile: aFileName
+	"Export the PDF document in a file"
+	
+	| stream |
+	stream := StandardFileStream fileNamed: aFileName.
+	stream nextPutAll: self generate.
+	stream close.! !
 
 !PDFDocument methodsFor: 'private' stamp: 'OlivierAuverlot 2/17/2012 12:22'!
 fontFullName: aFontName	"Answer the full name of a font"	^ ((self fontNames) at: aFontName)! !
@@ -1834,8 +2465,11 @@ getSubElements	| lines decalage currentXY current |	lines := self splitOn: (s
 !PDFParagraphElement methodsFor: 'action' stamp: 'GuillaumeLarcheveque 10/12/2012 15:49'!
 splitOn: aPage	"answer the lines of the paragraph (in the context of the specified page)"		| widthOfLine widthOfWord line lines  |			widthOfLine := 0.		line := WriteStream on: String new.	lines := OrderedCollection new.		self wordsList do: [ :aWord |		| word |		 word := aWord , ' '.		(widthOfLine + (widthOfWord := (self fontIfAbsent: aPage styleSheet) getStringWidth: word into: (aPage document))) <= (self wh x)			ifTrue: [ 				line nextPutAll: word.				widthOfLine := widthOfLine + widthOfWord.				]			ifFalse: [				lines add: (self chomp: (line contents asString)).				line resetContents; nextPutAll: word.				widthOfLine := widthOfWord.				]		].		lines add: (self chomp: (line contents asString)).		"close the stream"	line close.		^ lines! !
 
-!PDFParagraphElement methodsFor: 'private' stamp: 'OlivierAuverlot 3/23/2012 08:31'!
-wordsList	"answer the list of words in the text"		^(self text subStrings: ' ')! !
+!PDFParagraphElement methodsFor: 'private' stamp: 'gsa 12/25/2012 18:45'!
+wordsList
+	"answer the list of words in the text"
+	
+	^(self text subStrings: ' ')! !
 
 !PDFParagraphTest methodsFor: 'accessing' stamp: 'OlivierAuverlot 3/23/2012 09:40'!
 doc	^ doc! !
