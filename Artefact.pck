@@ -1,4 +1,4 @@
-'From Cuis 4.1 of 12 December 2012 [latest update: #1517] on 25 December 2012 at 6:46:09 pm'!
+'From Cuis 4.1 of 12 December 2012 [latest update: #1522] on 26 December 2012 at 2:39:53 pm'!
 'Description Please enter a description for this package '!
 !classDefinition: #PDFBasicTest category: #'Artefact-Test'!
 TestCase subclass: #PDFBasicTest
@@ -661,8 +661,62 @@ PDFZapfdingbatsFont class
 	instanceVariableNames: ''!
 
 
-!PDFDocument commentStamp: 'OlivierAuverlot 11/30/2012 09:27' prior: 0!
-!! Introduction.  _____          __          _____               __     /  _  \________/  |_  _____/ ____\____    _____/  |_  /  /_\  \_  __ \   __\/ __ \   __\\__  \ _/ ___\   __\/    |    \  | \/|  | \  ___/|  |   / __ \\  \___|  |  \____|__  /__|   |__|  \___  >__|  (____  /\___  >__|          \/                 \/           \/     \/      Artefact is a framework to generate PDF documents. There is fully written in Smalltalk and external libraries are not needed. There is light, platform independant and it's a tool with a high level of abstraction to easily creating PDF documents.   * written in Smalltalk (and only Smalltalk), * multi format document, * pages creation order could be totally different of the pages order in the PDF document, * ability to create multiple versions of a document, * page composition based on reusables PDF elements, * ability to define PDF code segments for inserting PDF instructions directly in the document (low level code), * PDF code optimization to produce compact filesAuthors: Olivier Auverlot and Guillaume Larcheveque!! How to creating my first PDF document ?!! Configuration of a PDF document!!!! PDF metadata!!!! Units of measurement!!!! Document formats!!!! Setting the position of items on a page!!!! Selecting the display mode!! Controlling the pages!!!! Creating and adding a page into a document!!!! Setting the page format!!!! Choosing the orientation!! The PDF elements!!!! Apparences of PDF elements!!!!!! Playing with fonts!!!!!! Colors and grey levels!!!!!! The story of dots!!!!!! Using the stylesheet!!!! Geometric shapes!!!!!! Lines!!!!!! Arrows!!!!!! Rectangles!!!!!! Polygons!!!!!! Circles!!!!!! Bezier curves!!!! Texts!!!!!! Formatted texts!!!!!! Cells of text!!!!!! Paragraphs!!!! Datatables!!!!!! Data table basic!!!!!! Datatable with captions!!!!!! Datatable customizable!! Creating PDF elements!! FAQ!
+!PDFDocument commentStamp: 'gsa 12/26/2012 14:39' prior: 0!
+!! Introduction
+
+.  _____          __          _____               __   
+  /  _  \________/  |_  _____/ ____\____    _____/  |_ 
+ /  /_\  \_  __ \   __\/ __ \   __\\__  \ _/ ___\   __\
+/    |    \  | \/|  | \  ___/|  |   / __ \\  \___|  |  
+\____|__  /__|   |__|  \___  >__|  (____  /\___  >__|  
+        \/                 \/           \/     \/      
+
+Artefact is a framework to generate PDF documents. There is fully written in Smalltalk and external libraries are not needed. There is light, platform independant and it's a tool with a high level of abstraction to easily creating PDF documents.  
+
+ * written in Smalltalk (and only Smalltalk),
+ * multi format document,
+ * pages creation order could be totally different of the pages order in the PDF document,
+ * ability to create multiple versions of a document,
+ * page composition based on reusables PDF elements,
+ * ability to define PDF code segments for inserting PDF instructions directly in the document (low level code),
+ * PDF code optimization to produce compact files
+
+Authors: Olivier Auverlot and Guillaume Larcheveque
+
+!! How to creating my first PDF document ?
+!! Configuration of a PDF document
+!!!! PDF metadata
+!!!! Units of measurement
+!!!! Document formats
+!!!! Setting the position of items on a page
+!!!! Selecting the display mode
+!! Controlling the pages
+!!!! Creating and adding a page into a document
+!!!! Setting the page format
+!!!! Choosing the orientation
+!! The PDF elements
+!!!! Apparences of PDF elements
+!!!!!! Playing with fonts
+!!!!!! Colors and grey levels
+!!!!!! The story of dots
+!!!!!! Using the stylesheet
+!!!! Geometric shapes
+!!!!!! Lines
+!!!!!! Arrows
+!!!!!! Rectangles
+!!!!!! Polygons
+!!!!!! Circles
+!!!!!! Bezier curves
+!!!! Texts
+!!!!!! Formatted texts
+!!!!!! Cells of text
+!!!!!! Paragraphs
+!!!! Datatables
+!!!!!! Data table basic
+!!!!!! Datatable with captions
+!!!!!! Datatable customizable
+!! Creating PDF elements
+!! FAQ!
 
 !PDFFormat commentStamp: 'OlivierAuverlot 8/5/2012 19:04' prior: 0!
 PDFFormat has not been documented yet. The class comment should describe the purpose of the class, its collaborations and its variables.Instance Variables:	portrait	<ProtoObject>	margins	<Point | TTPoint>	size	<Point | TTPoint>			28,347619048	!
@@ -1377,8 +1431,36 @@ circlesTest
 	
 	pdfdoc exportToFile: self demoPath  , 'circlesTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'color' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-colorTest	"generate a sample document with colors"	"self colorTest"		| pdfdoc aPage myFont |	pdfdoc := PDFDocument new.		aPage := PDFPage new.	aPage add: (PDFCellElement new 		font: (PDFTimesFont new fontSize: 32);		wh: 100@20; 		border: true; 		text: 'Hello World!!';		ink: (PDFColor new setColor: #(255 0 0) );		fillColor: (PDFColor new setColor: #(0 255 0))		).	aPage add: (PDFRectElement new 		from: 10@50;		wh: 50@50; 		width: 5;		ink: (PDFColor new setColor: #(0 0 255));		fillColor: (PDFColor new setColor: #(0 255 0))		).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'colorTest.pdf'.! !
+!PDFDemos class methodsFor: 'color' stamp: 'gsa 12/26/2012 14:32'!
+colorTest
+	"generate a sample document with colors"
+
+	"self colorTest"
+	
+	| pdfdoc aPage myFont |
+	pdfdoc := PDFDocument new.
+	
+	aPage := PDFPage new.
+	aPage add: (PDFCellElement new 
+		font: (PDFTimesFont new fontSize: 32);
+		wh: 100@20; 
+		border: true; 
+		text: 'Hello World!!';
+		ink: (PDFColor new setColor: #(255 0 0) );
+		fillColor: (PDFColor new setColor: #(0 255 0))
+		).
+	aPage add: (PDFRectElement new 
+		from: 10@50;
+		wh: 50@50; 
+		width: 5;
+		ink: (PDFColor new setColor: #(0 0 255));
+		fillColor: (PDFColor new setColor: #(0 255 0))
+		).
+		
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'colorTest.pdf'.
+! !
 
 !PDFDemos class methodsFor: 'composite' stamp: 'gsa 12/25/2012 18:23'!
 datatableCustomizedElementTest
@@ -1521,8 +1603,52 @@ datatableWithCaptionsTest
 	
 	! !
 
-!PDFDemos class methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-demo	"a simple demonstration of Artefact"		"PDFDemos demo"		| pdfdoc myFont myBigFont aPage |	pdfdoc := PDFDocument new.		myBigFont := PDFCourierFont new fontSize: 36; bold: true.	myFont := PDFHelveticaFont new fontSize: 16.		aPage := PDFPage new.	aPage add: (PDFCellElement new 		font: myBigFont; 		wh: 100@60; 		border: true; 		linefeed: true; 		textColor: (PDFColor new setColor: #(0 255 0));		text: 'Première ligne').			aPage add: (PDFCellElement new 		font: myBigFont;		wh: 100@24; 		border: true; 		linefeed: true;		textColor: (PDFColor new setColor: #(128 128 0)); 		text: 'Artefact').		aPage add: (PDFCellElement new 		font: myFont; 		wh: 100@10; 		border: true; 		linefeed: true; 		textColor: (PDFColor new setColor: #(0 0 0));		text: 'PDF Framework for Pharo').				aPage add: (PDFLineElement new from: 10@10; to: 20@10; drawColor: (PDFColor new setColor: #(255 0 0))).	aPage add: (PDFLineElement new from: 10@10; to: 10@20; drawColor:(PDFColor new setColor: #(255 0 0))).		pdfdoc add: aPage.	pdfdoc explore.		pdfdoc exportToFile: self demoPath , 'demo.pdf'.! !
+!PDFDemos class methodsFor: 'as yet unclassified' stamp: 'gsa 12/26/2012 14:34'!
+demo
+	"a simple demonstration of Artefact"
+	
+	"PDFDemos demo"
+	
+	| pdfdoc myFont myBigFont aPage |
+	pdfdoc := PDFDocument new.	
+
+	myBigFont := PDFCourierFont new fontSize: 36; bold: true.
+	myFont := PDFHelveticaFont new fontSize: 16.
+	
+	aPage := PDFPage new.
+
+	aPage add: (PDFCellElement new 
+		font: myBigFont; 
+		wh: 100@60; 
+		border: true; 
+		linefeed: true; 
+		textColor: (PDFColor new setColor: #(0 255 0));
+		text: 'Première ligne').
+		
+	aPage add: (PDFCellElement new 
+		font: myBigFont;
+		wh: 100@24; 
+		border: true; 
+		linefeed: true;
+		textColor: (PDFColor new setColor: #(128 128 0)); 
+		text: 'Artefact').
+	
+	aPage add: (PDFCellElement new 
+		font: myFont; 
+		wh: 100@10; 
+		border: true; 
+		linefeed: true; 
+		textColor: (PDFColor new setColor: #(0 0 0));
+		text: 'PDF Framework for Pharo').
+			
+	aPage add: (PDFLineElement new from: 10@10; to: 20@10; drawColor: (PDFColor new setColor: #(255 0 0))).
+	aPage add: (PDFLineElement new from: 10@10; to: 10@20; drawColor:(PDFColor new setColor: #(255 0 0))).
+
+	
+	pdfdoc add: aPage.
+	pdfdoc explore.
+	
+	pdfdoc exportToFile: self demoPath , 'demo.pdf'.! !
 
 !PDFDemos class methodsFor: 'accessing' stamp: 'gsa 12/25/2012 18:15'!
 demoPath
@@ -1599,14 +1725,79 @@ euroTest
 !PDFDemos class methodsFor: 'color' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 greyLevelTest	"generate a sample document with grey levels"	"self greyLevelTest"		| pdfdoc aPage myFont |	pdfdoc := PDFDocument new.		aPage := PDFPage new.	aPage add: (PDFTextElement new 		from: 10@10; 		text: 'A grey level text'; 		font: (PDFCourierFont new);		ink: (PDFColor new setGreyLevel: 128)		).			aPage add: (PDFRectElement new 		from: 10@20;		wh: 50@50; 		width: 5;		ink: (PDFColor new setGreyLevel: 196);		fillColor: (PDFColor new setGreyLevel: 164)		).			pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'greyLevelTest.pdf'.! !
 
-!PDFDemos class methodsFor: 'experimental' stamp: 'OlivierAuverlot 11/16/2012 13:57'!
-headerFooterTest	"generate a sample document with a header and a footer"	"self headerFooterTest"		| pdfdoc aPage secondPage myFont |	myFont := PDFCourierFont new fontSize: 32.	pdfdoc := PDFDocument new.		aPage := PDFPage new.	aPage add: (PDFCellElement new 		font: myFont;		text: 'Header and Footer test').	pdfdoc add: aPage.	secondPage := PDFPage new.	secondPage add: (PDFCellElement new 		font: myFont;		text: 'Header and Footer test').					"secondPage header: false; footer: false."	pdfdoc add: secondPage.						pdfdoc exportToFile: self demoPath , 'headerFooterTest.pdf'.		! !
+!PDFDemos class methodsFor: 'experimental' stamp: 'gsa 12/26/2012 14:36'!
+headerFooterTest
+	"generate a sample document with a header and a footer"
 
-!PDFDemos class methodsFor: 'experimental' stamp: 'OlivierAuverlot 9/21/2012 20:56'!
-imagePNG	"Artefact use an PNG file"		"self imagePNG"		| pdfdoc myImage aPage |	pdfdoc := PDFDocument new.		myImage := PDFPNGImage new fileName: '/Users/olivier/Desktop/artefact/phare.png'.	myImage inspect.		aPage := PDFPage new.	"aPage add: (PDFImageStyle new image: myImage; 		xy: 5@5; 		wh: 100@30)."	pdfdoc add: aPage.		pdfdoc exportToFile: '/Users/olivier/Desktop/demo.pdf'.! !
+	"self headerFooterTest"
+	
+	| pdfdoc aPage secondPage myFont |
 
-!PDFDemos class methodsFor: 'document' stamp: 'OlivierAuverlot 9/21/2012 20:57'!
-infosTest	"generate a sample document with informations"	"self infosTest"		| pdfdoc aPage aSecondPage |	pdfdoc := PDFDocument new.		pdfdoc title: 'Le titre du document'; 		subject: 'test de la zone d''information'; 		author: 'Olivier Auverlot'; 		keywords: 'test zone infos';		creator: 'Artefact - Pharo'.		aPage := PDFPage new.		pdfdoc add: aPage.	pdfdoc exportToFile: self demoPath , 'infosTest.pdf'.		! !
+	myFont := PDFCourierFont new fontSize: 32.
+
+	pdfdoc := PDFDocument new.
+	
+	aPage := PDFPage new.
+	aPage add: (PDFCellElement new 
+		font: myFont;
+		text: 'Header and Footer test').
+
+	pdfdoc add: aPage.
+
+	secondPage := PDFPage new.
+	secondPage add: (PDFCellElement new 
+		font: myFont;
+		text: 'Header and Footer test').	
+			
+	"secondPage header: false; footer: false."
+	pdfdoc add: secondPage.		
+			
+	pdfdoc exportToFile: self demoPath , 'headerFooterTest.pdf'.
+
+	
+	! !
+
+!PDFDemos class methodsFor: 'experimental' stamp: 'gsa 12/26/2012 14:37'!
+imagePNG
+	"Artefact use an PNG file"
+	
+	"self imagePNG"
+	
+	| pdfdoc myImage aPage |
+	pdfdoc := PDFDocument new.	
+	myImage := PDFPNGImage new fileName: '/Users/olivier/Desktop/artefact/phare.png'.
+	myImage inspect.
+	
+	aPage := PDFPage new.
+	"aPage add: (PDFImageStyle new image: myImage; 
+		xy: 5@5; 
+		wh: 100@30)."
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: '/Users/olivier/Desktop/demo.pdf'.! !
+
+!PDFDemos class methodsFor: 'document' stamp: 'gsa 12/26/2012 14:37'!
+infosTest
+	"generate a sample document with informations"
+
+	"self infosTest"
+	
+	| pdfdoc aPage aSecondPage |
+	pdfdoc := PDFDocument new.
+	
+	pdfdoc title: 'Le titre du document'; 
+		subject: 'test de la zone d''information'; 
+		author: 'Olivier Auverlot'; 
+		keywords: 'test zone infos';
+		creator: 'Artefact - Pharo'.
+	
+	aPage := PDFPage new.
+	
+	pdfdoc add: aPage.
+	pdfdoc exportToFile: self demoPath , 'infosTest.pdf'.
+
+	
+	! !
 
 !PDFDemos class methodsFor: 'draw' stamp: 'gsa 12/25/2012 18:18'!
 lineTest
@@ -1825,8 +2016,39 @@ twoColoredRectsTest
 !PDFDemos class methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
 unCarresDansUnCarreStyle	"un test de style géométrique"		"self unCarresDansUnCarreStyle"		| pdfdoc aPage |	pdfdoc := PDFDocument new.			aPage := PDFPage new.		aPage add: (UnCarreDansUnCarre new		from: 10@10;		wh: 100@30;		borderSize: 5@2 ).			pdfdoc add: aPage.		pdfdoc exportToFile: '/home/olivier/Desktop/deuxCarreDansUnCarre.pdf'.! !
 
-!PDFDemos class methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 11/17/2012 14:05'!
-widthTest	"generate a sample document for testing the width of fonts"	"PDFDemos widthTest"		| pdfdoc aPage myFont myBigFont width text size |	pdfdoc := PDFDocument new.					myFont := PDFTimesFont new fontSize: 16.	myBigFont := PDFTimesFont new fontSize: 1.	text := 'Hello World !!'.	"myBigFont fontSize: (myBigFont getIdealFontSizeForTheString: text width: 100 into: pdfdoc).	"	aPage := PDFPage new.	"aPage add: (PDFCellStyle new wh: 100@32; border: true; linefeed: true; text: 'Une première ligne')."		width := myFont getStringWidth: text into: pdfdoc.		aPage add: (PDFCellElement new font: myFont; wh: width@10; border: true; linefeed: true; text: text).	"aPage add: (PDFCellStyle new font: myBigFont; wh: 100@10; border: true; linefeed: true; text: text)."		"Transcript show: pdfdoc margins asString."	aPage add: (PDFLineElement new from: 10@60; to: 110@60).	pdfdoc add: aPage.		pdfdoc exportToFile: self demoPath , 'widthTest.pdf'.		! !
+!PDFDemos class methodsFor: 'as yet unclassified' stamp: 'gsa 12/26/2012 14:35'!
+widthTest
+	"generate a sample document for testing the width of fonts"
+
+	"PDFDemos widthTest"
+	
+	| pdfdoc aPage myFont myBigFont width text size |
+
+	pdfdoc := PDFDocument new.	
+			
+	myFont := PDFTimesFont new fontSize: 16.
+	myBigFont := PDFTimesFont new fontSize: 1.
+	text := 'Hello World !!'.
+
+	"myBigFont fontSize: (myBigFont getIdealFontSizeForTheString: text width: 100 into: pdfdoc).	"
+
+	aPage := PDFPage new.
+	"aPage add: (PDFCellStyle new wh: 100@32; border: true; linefeed: true; text: 'Une première ligne')."
+	
+	width := myFont getStringWidth: text into: pdfdoc.
+	
+	aPage add: (PDFCellElement new font: myFont; wh: width@10; border: true; linefeed: true; text: text).
+
+	"aPage add: (PDFCellStyle new font: myBigFont; wh: 100@10; border: true; linefeed: true; text: text)."
+	
+	"Transcript show: pdfdoc margins asString."
+	aPage add: (PDFLineElement new from: 10@60; to: 110@60).
+	pdfdoc add: aPage.
+	
+	pdfdoc exportToFile: self demoPath , 'widthTest.pdf'.
+
+	
+	! !
 
 !PDFDemos class methodsFor: 'document' stamp: 'OlivierAuverlot 11/30/2012 09:37'!
 zoomTest	"generate documents with zooms"	"self zoomTest"	PDFDocument new fullPage; yourself; 		add: (PDFPage new add: (PDFTextElement text: 'Fullpage document'));		exportToFile: self demoPath , 'fullPageTest.pdf'.				! !
@@ -2489,8 +2711,20 @@ paragraph	^ paragraph! !
 !PDFParagraphTest methodsFor: 'accessing' stamp: 'OlivierAuverlot 3/23/2012 09:40'!
 paragraph: anObject	paragraph := anObject! !
 
-!PDFParagraphTest methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 11/16/2012 13:57'!
-setUp	self doc: PDFDocument new.	self page: PDFPage new.		self paragraph: (PDFParagraphElement new 		wh: 160@60; 		border: false; 		text: 'Emensis itaque difficultatibus multis et nive obrutis callibus plurimis ubi prope Rauracum ventum est ad supercilia fluminis Rheni, resistente multitudine Alamanna pontem suspendere navium conpage Romani vi nimia vetabantur ritu grandinis undique convolantibus telis, et cum id inpossibile videretur, imperator cogitationibus magnis attonitus, quid capesseret ambigebat.').			self page add: self paragraph.	self doc add: self page.		self doc generate.! !
+!PDFParagraphTest methodsFor: 'as yet unclassified' stamp: 'gsa 12/26/2012 10:02'!
+setUp
+	self doc: PDFDocument new.
+	self page: PDFPage new.
+	
+	self paragraph: (PDFParagraphElement new 
+		wh: 160@60; 
+		border: false; 
+		text: 'Emensis itaque difficultatibus multis et nive obrutis callibus plurimis ubi prope Rauracum ventum est ad supercilia fluminis Rheni, resistente multitudine Alamanna pontem suspendere navium conpage Romani vi nimia vetabantur ritu grandinis undique convolantibus telis, et cum id inpossibile videretur, imperator cogitationibus magnis attonitus, quid capesseret ambigebat.').
+		
+	self page add: self paragraph.
+	self doc add: self page.
+	
+	self doc generate.! !
 
 !PDFParagraphTest methodsFor: 'as yet unclassified' stamp: 'OlivierAuverlot 3/23/2012 09:33'!
 tearDown ! !
